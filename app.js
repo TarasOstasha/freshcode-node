@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const { logUsers } = require('./controllers/readFiles.js');
-
+const userApiPath = './api/users.json';
 
 
 const {
@@ -17,14 +17,14 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
   try {
-      const users = fs.readFileSync('./api/users.json', { encoding: 'utf-8' });
+      const users = fs.readFileSync(userApiPath, { encoding: 'utf-8' });
       const usersObj = JSON.parse(users);
       res.status(200).send(usersObj);
   } catch (error) {
       res.status(500).json({status: error, msg: 'Internal Server Error'})
   }
   // async method
-  logUsers(usersFolder)
+  logUsers(userApiPath)
 });
 
 
