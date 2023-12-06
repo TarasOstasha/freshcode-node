@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const RS = require("random-words-and-sentences");
+const createError = require('http-errors');
 
 const randomSentence = RS.getRandomSentence();
 
@@ -25,34 +26,38 @@ module.exports.getTasks = (req, res) => {
   res.status(200).send(tasks);
 };
 
-module.exports.getTaskById = (req, res) => {
+module.exports.getTaskById = (req, res, next) => {
   const { id } = req.params;
   const foundTask = tasks.find(t => t.id === id);
   if (!foundTask) {
-    return res.status(404).send('Task Not Found');
+    //return res.status(404).send('Task Not Found'); // old version without http-errors
+    return next(createError(404, 'Task is Not Found'));
   }
 
   res.status(200).send(foundTask);
 };
 
-module.exports.updateTaskById = (req, res) => {
+module.exports.updateTaskById = (req, res, next) => {
   const {
     params: { id },
     body,
   } = req;
   const foundTaskIndex = tasks.findIndex(t => t.id === id);
   if (foundTaskIndex === -1) {
-    return res.status(404).send('Task Not Found');
+    // return res.status(404).send('Task Not Found'); old version without http-errors
+    return next(createError(404, 'Task is Not Found'))
   }
   tasks[foundTaskIndex] = { ...tasks[foundTaskIndex], ...body };
   res.status(200).send(tasks[foundTaskIndex]);
 };
 
-module.exports.removeTaskById = (req, res) => {
+module.exports.removeTaskById = (req, res, next) => {
   const { id } = req.params;
   const foundTaskIndex = tasks.findIndex(t => t.id === id);
   if (foundTaskIndex === -1) {
-    return res.status(404).send('Task Not Found');
+    //return res.status(404).send('Task Not Found'); // old version without http-errors
+    return next(createError(404, 'Task is Not Found'))
+
   }
   tasks.splice(foundTaskIndex, 1);
   res.status(204).end();
